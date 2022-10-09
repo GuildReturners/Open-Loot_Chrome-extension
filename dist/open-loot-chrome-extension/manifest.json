@@ -1,0 +1,17 @@
+{
+    "name": "Returners - Open Loot",
+    "version": "1.0",
+    "description": "This extension gives super power to Open Loot",
+    "manifest_version": 3,
+    "permissions": [
+      "activeTab",
+      "webNavigation"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+      "default_popup": "index.html"
+  }
+}
