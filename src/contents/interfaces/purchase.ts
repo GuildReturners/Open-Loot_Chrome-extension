@@ -19,7 +19,7 @@ export interface Purchases {
     completedBy: String;
 }
 
- interface Item {
+ export interface Item {
     id: Key;
     userId: String;
     status: String;
@@ -28,7 +28,7 @@ export interface Purchases {
     archetypeId: String;
     name: String;
     description: String;
-    imageUrl: String;
+    imageUrl: string;
     tags: String[];
     rarity: String;
     issuedId: Number;

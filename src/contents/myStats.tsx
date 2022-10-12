@@ -81,6 +81,22 @@ function MyStats() {
         {
           header: 'Price',
           accessorKey: 'price',
+          aggregationFn: 'mean',
+          //required to render an aggregated cell, show the average salary in the group
+          AggregatedCell: ({ cell, table }) => (
+            <>
+              Average by{' '}
+              {table.getColumn(cell.row.groupingColumnId ?? '').columnDef.header}:{' '}
+              <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                {cell.getValue<number>()?.toLocaleString?.('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
+              </Box>
+            </>
+          ),
         },        
         {
           header: 'Id',
