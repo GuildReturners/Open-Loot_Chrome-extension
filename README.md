@@ -1,25 +1,33 @@
-# Open Loot - Chrome Extension
+This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
-This project is created by the Guild Returners. https://discord.gg/R8rSMm2zwJ
-It's goal is too add custom feature into the Open Loot marketplace. 
+## Getting Started
 
+First, run the development server:
 
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
+Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
 
-## How to install
+You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
 
-Download this repository
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-Open your chrome and put `chrome://extensions/` in  the URL bar
-Check the box : developper mode
-Click to load unpackaged extension
-Select `dist/open-loot-chrome-extension`
+For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 
+## Making production build
 
-## Dev
+Run the following:
 
-Run `ng build -- watch` to rebuild the project on any change. You still will need to reopen the extension in order to update it.
+```bash
+pnpm build
+# or
+npm run build
+```
 
-## Code scaffolding
+This should create a production bundle for your extension, ready to be zipped and published to the stores.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Submit to the webstores
+
+The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/workflows/submit) and you should be on your way for automated submission!

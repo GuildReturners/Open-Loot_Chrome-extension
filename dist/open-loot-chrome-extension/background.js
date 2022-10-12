@@ -1,1 +1,0 @@
-(()=>{"use strict";chrome.runtime.onInstalled.addListener(()=>{chrome.webNavigation.onCompleted.addListener(()=>{chrome.tabs.query({active:!0,currentWindow:!0},([{id:e}])=>{e&&chrome.action.disable(e)})},{url:[{hostContains:"google.com"}]})})})();
