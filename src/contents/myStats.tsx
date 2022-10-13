@@ -3,8 +3,8 @@ import { FC, useMemo, useReducer } from "react"
 
 import type { PurchasedItem, Purchases } from "./interfaces/purchase"
 import type { PlasmoContentScript, PlasmoGetInlineAnchor } from "plasmo";
-import MaterialReactTable, { MRT_ColumnDef } from 'material-react-table';
-import { Box, Stack } from '@mui/material';
+import MaterialReactTable, { MRT_ColumnDef, MRT_Row } from 'material-react-table';
+import { Box, Divider, Stack } from '@mui/material';
 
 
 // import { purchasesData } from "./mocks/purchases";
@@ -69,7 +69,13 @@ function MyStats() {
 
 
 
-
+    function getAvgPrice(items) {
+      // return items.length
+       return items.map( i => i.original.price).reduce( (acc, data) => (acc + data) ) /items.length
+    }    
+    function getSumPrice(items) {
+      return items.map( i => i.original.price).reduce( (acc, data) => (acc + data)) 
+    }
 
     const columns = useMemo<MRT_ColumnDef<PurchasedItem>[]>(
       () => [
@@ -81,23 +87,34 @@ function MyStats() {
         {
           header: 'Price',
           accessorKey: 'price',
-          aggregationFn: 'mean',
           //required to render an aggregated cell, show the average salary in the group
-          AggregatedCell: ({ cell, table }) => (
-            <>
-              Average by{' '}
-              {table.getColumn(cell.row.groupingColumnId ?? '').columnDef.header}:{' '}
-              <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
-                {cell.getValue<number>()?.toLocaleString?.('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
-              </Box>
-            </>
+          AggregatedCell: ({ cell, table, row, column }) => (
+            <Stack
+              direction="row"
+              divider={<Divider orientation="horizontal" flexItem />}
+              spacing={2}
+            >
+              <Stack>
+                Avg :
+                <Box color="success.main">{getAvgPrice(row.getLeafRows())?.toLocaleString?.('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+                })}</Box>
+              </Stack>
+              <Stack>
+                Total:
+                <Box color="success.main">{cell.getValue<number>()?.toLocaleString?.('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+                })}</Box>
+              </Stack>
+            </Stack>
           ),
-        },        
+        },            
         {
           header: 'Id',
           accessorKey: 'item.issuedId',
