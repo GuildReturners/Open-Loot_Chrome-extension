@@ -38,38 +38,34 @@ PlasmoGetInlineAnchor = () =>
 
   function loadPurchase(){
 
+    let page = 1 
     const getPurchase = (page)=>{
         return fetch('https://openloot.com/api/market/purchases?pageSize=100&page='+page)
     }
   
-    let page = 1 
-    let purchases:Purchases;
-  
-    getPurchase(page).then(res=>{
-        console.log('result',res)
-        res.json().then((obj)=>{
-            console.log('obj',obj)
-            purchases  = obj
-            let totalPage = obj.totalPages
-  
-            for (let i = 2; i <= purchases.totalPages; i++) {
-                console.log(purchases.items)
-                getPurchase(i).then(res=>{
-                    console.log('result',res)
-                    res.json().then((obj)=>{
-                        purchases.items.push(...obj.items);
-                        console.log('total page',purchases.items);
-
-                        // purchases.items = purchases.items.map(purchasesItem=>{
-                        //      purchasesItem.createdAt = new Date(purchasesItem.createdAt.toString()).getDate().toString()
-                        //      return purchasesItem
-                        // })
-
-                        localStorage['purchases'] = JSON.stringify(purchases)
-
-                    })
-                })
-            }
+    let purchasesAcc
+    getPurchase(page)
+      .then(res=> res.json())
+      .then(async (purchases)=>{
+        purchasesAcc = purchases
+        purchasesAcc.items.map(purchasedItem=>{
+          purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
+          return purchasedItem
         })
+        for (let i = 1; i <= purchases.totalPages; i++) {
+            await getPurchase(i)
+              .then(res=> res.json())
+              .then((obj)=>{
+                let purchasedItemsFromCurrentPage = obj.items.map(purchasedItem=>{
+                      purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
+                      return purchasedItem
+                })
+                console.log('purchasedItemsFromCurrentPage',purchasedItemsFromCurrentPage);
+                
+                purchasesAcc.items.push(...purchasedItemsFromCurrentPage);  
+              })
+              .then(()=>localStorage['purchases'] = JSON.stringify(purchasesAcc))
+              .then(()=> alert('Your purchases history have been loaded'))
+        }
     })
   }

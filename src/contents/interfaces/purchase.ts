@@ -13,24 +13,24 @@ export interface Purchases {
     id: Key;
     price: Number;
     item : Item;
-    status: String;
-    createdBy: String;
-    createdAt: String;
-    completedBy: String;
+    status: string;
+    createdBy: string;
+    createdAt: string;
+    completedBy: string;
 }
 
  export interface Item {
     id: Key;
-    userId: String;
-    status: String;
-    collection: String;
-    optionName: String;
-    archetypeId: String;
-    name: String;
-    description: String;
+    userId: string;
+    status: string;
+    collection: string;
+    optionName: string;
+    archetypeId: string;
+    name: string;
+    description: string;
     imageUrl: string;
-    tags: String[];
-    rarity: String;
+    tags: string[];
+    rarity: string;
     issuedId: Number;
     maxIssuance: Number;
     game : {}

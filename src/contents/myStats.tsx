@@ -122,11 +122,16 @@ function UserStats() {
       {
         header: 'Purchase Date',
         accessorKey: 'createdAt',
+        Cell: ({ cell }) => (
+          <>
+            {new Date(parseInt(cell.getValue<string>())).toLocaleDateString()}
+          </>
+        ),
       },
       {
         header: 'Rarity',
         accessorKey: 'item.rarity',
-        Cell: ({ cell, row }) => (
+        Cell: ({ cell }) => (
           <>
             <Chip label={cell.getValue().toString()} color={getChipColorFromRarity(cell.getValue())}  />
           </>
@@ -180,7 +185,7 @@ function UserStats() {
           density: 'compact',
           grouping: ['item.name'],
           pagination: { pageIndex: 0, pageSize: 200 },
-          sorting: [{ id: 'price', desc: false }], //sort by state by default
+          sorting: [{ id: 'createdAt', desc: true }], //sort by state by default
         }}
         muiToolbarAlertBannerChipProps={{ color: 'primary' }}
         muiTableContainerProps={{ sx: { maxHeight: 500 } }}
