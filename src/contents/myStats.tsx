@@ -105,7 +105,7 @@ function UserStats() {
       {
         header: 'Price',
         accessorKey: 'price',
-        //required to render an aggregated cell, show the average salary in the group
+        size:50,
         AggregatedCell: ({ cell, table, row, column }) => (
           <Stack
             direction="row"
@@ -136,10 +136,12 @@ function UserStats() {
       {
         header: 'Id',
         accessorKey: 'item.issuedId',
+        size : 50,
       },
       {
         header: 'Purchase Date',
         accessorKey: 'createdAt',
+        size : 50,
         Cell: ({ cell }) => (
           <>
             {new Date(parseInt(cell.getValue<string>())).toLocaleDateString()}
@@ -149,6 +151,7 @@ function UserStats() {
       {
         header: 'Rarity',
         accessorKey: 'item.rarity',
+        size : 50,
         Cell: ({ cell }) => (
           <>
             <Chip label={cell.getValue().toString()} color={getChipColorFromRarity(cell.getValue())}  />
@@ -158,6 +161,17 @@ function UserStats() {
       {
         header: 'Status',
         accessorKey: 'item.status',
+        size : 50,
+      },
+      {
+        header: 'Category',
+        accessorKey: 'category',
+        size : 50,
+      },   
+      {
+        header: 'Type',
+        accessorKey: 'type',
+        size : 50,
       },      
       {
         header: 'openlootid',
@@ -166,6 +180,11 @@ function UserStats() {
       {
         header: 'Seller',
         accessorKey: 'createdBy',
+        Cell: ({ cell }) => (
+          <>
+            {(cell.getValue<string>().substring(0,2))}... {(cell.getValue<string>().slice(-2))}
+          </>
+        ),
       },     
       
     ],

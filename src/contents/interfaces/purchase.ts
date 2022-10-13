@@ -17,6 +17,8 @@ export interface Purchases {
     createdBy: string;
     createdAt: string;
     completedBy: string;
+    category:string;
+    type:string;
 }
 
  export interface Item {

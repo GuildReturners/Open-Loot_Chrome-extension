@@ -50,14 +50,25 @@ PlasmoGetInlineAnchor = () =>
         purchasesAcc = purchases
         purchasesAcc.items.map(purchasedItem=>{
           purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
+          if(purchasedItem.item.tags.includes("weapons"))     {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Weapons"}
+          if(purchasedItem.item.tags.includes("armor"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Armor"}
+          if(purchasedItem.item.tags.includes("title"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Title"}
+          if(purchasedItem.item.tags.includes("space"))       {  purchasedItem.category = "utility" ;  purchasedItem.type = "Space"}
+          if(purchasedItem.item.tags.includes("mysterybox"))  {  purchasedItem.category = "utility" ;  purchasedItem.type = "Mystery box"}
           return purchasedItem
         })
-        for (let i = 1; i <= purchases.totalPages; i++) {
+
+        for (let i = 2; i <= purchases.totalPages; i++) {
             await getPurchase(i)
               .then(res=> res.json())
               .then((obj)=>{
                 let purchasedItemsFromCurrentPage = obj.items.map(purchasedItem=>{
                       purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
+                      if(purchasedItem.item.tags.includes("weapons"))     {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Weapons"}
+                      if(purchasedItem.item.tags.includes("armor"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Armor"}
+                      if(purchasedItem.item.tags.includes("title"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Title"}
+                      if(purchasedItem.item.tags.includes("space"))       {  purchasedItem.category = "utility" ;  purchasedItem.type = "Space"}
+                      if(purchasedItem.item.tags.includes("mysterybox"))  {  purchasedItem.category = "utility" ;  purchasedItem.type = "Mystery box"}
                       return purchasedItem
                 })
                 console.log('purchasedItemsFromCurrentPage',purchasedItemsFromCurrentPage);
@@ -65,7 +76,7 @@ PlasmoGetInlineAnchor = () =>
                 purchasesAcc.items.push(...purchasedItemsFromCurrentPage);  
               })
               .then(()=>localStorage['purchases'] = JSON.stringify(purchasesAcc))
-              .then(()=> alert('Your purchases history have been loaded'))
+              
         }
-    })
+    }).then(()=> alert('Your purchases history have been loaded'))
   }
