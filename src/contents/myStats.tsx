@@ -83,6 +83,24 @@ function UserStats() {
         header: 'Item',
         accessorKey: 'item.name',
         enableGrouping: true, //don't let this column be grouped
+        Cell: ({ cell, row }) => (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+            }}
+          >
+            <img
+              alt="avatar"
+              height={30}
+              src={row.original.item.imageUrl}
+              loading="lazy"
+              style={{ borderRadius: '5%' }}
+            />
+            <Typography>{cell.getValue<string>()}</Typography>
+          </Box>
+        ),
       },
       {
         header: 'Price',
