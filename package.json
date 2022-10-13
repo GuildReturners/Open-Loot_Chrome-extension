@@ -1,9 +1,9 @@
 {
   "name": "returners-open-loot-chrome-extension",
-  "displayName": "Returners open loot chrome extension",
-  "version": "0.0.0",
-  "description": "A basic Plasmo extension.",
-  "author": "jeremie",
+  "displayName": "Returners  - Open Loot",
+  "version": "0.1.1",
+  "description": "Giving super power to Open Loot",
+  "author": "Zet",
   "packageManager": "npm@8.19.2",
   "scripts": {
     "dev": "plasmo dev",

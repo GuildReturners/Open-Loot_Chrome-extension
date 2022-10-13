@@ -9,7 +9,7 @@ import { ExportToCsv } from 'export-to-csv';
 
 import createCache from "@emotion/cache"
 import { CacheProvider } from "@emotion/react"
-import { Box, Divider, Stack, Button, Input, Link, Popover, Typography } from '@mui/material';
+import { Box, Divider, Stack, Button, Input, Link, Popover, Typography, Chip } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 // Configure on which page this component will be mounted
@@ -46,6 +46,23 @@ function fixPopover(){
 function getAvgPrice(items) {
   return items.map( i => i.original.price).reduce( (acc, data) => (acc + data) ) /items.length
 }    
+
+function getChipColorFromRarity(rarity) {
+  switch(rarity) {
+    case 'uncommon':
+      return 'success';
+    case 'rare':
+      return 'primary';
+    case 'epic':
+      return 'secondary';
+    case 'legendary':
+      return 'warning';
+    case 'exalted':
+      return 'error';
+    default:
+      return 'default';
+  }
+}
 
 
 
@@ -109,6 +126,11 @@ function UserStats() {
       {
         header: 'Rarity',
         accessorKey: 'item.rarity',
+        Cell: ({ cell, row }) => (
+          <>
+            <Chip label={cell.getValue().toString()} color={getChipColorFromRarity(cell.getValue())}  />
+          </>
+        ),
       },
       {
         header: 'Status',
