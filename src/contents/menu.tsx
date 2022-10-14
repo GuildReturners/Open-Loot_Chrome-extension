@@ -58,6 +58,8 @@ PlasmoGetInlineAnchor = () =>
           return purchasedItem
         })
 
+        localStorage['purchases'] = JSON.stringify(purchasesAcc)
+
         for (let i = 2; i <= purchases.totalPages; i++) {
             await getPurchase(i)
               .then(res=> res.json())
