@@ -1,6 +1,15 @@
 import { useState } from "react"
+import type { PlasmoContentScript, PlasmoGetInlineAnchor } from "plasmo";
+import type { Item, ItemLocalStorage, Market, Order, Orders } from "./interfaces/purchase";
+import { DataArray } from "@mui/icons-material";
 
-function IndexPopup() {
+export const config: PlasmoContentScript = {
+  matches : [ "https://openloot.com/*"]
+}
+
+export const getInlineAnchor : PlasmoGetInlineAnchor = () =>  document.querySelector(".chakra-link")
+
+function Menu() {
   const [data, setData] = useState("")
 
   return (
@@ -11,74 +20,137 @@ function IndexPopup() {
     <a onClick={loadOwnData}>
         <button className="inline-flex items-center justify-center w-8 h-4 ml-2 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">Load my data</button>
     </a>
+
   </div>
   )
 }
 
-export default IndexPopup
+export default Menu
 
 
-import type { PlasmoContentScript, PlasmoGetInlineAnchor } from "plasmo";
-import type { Purchases } from "./interfaces/purchase";
-
-export const config: PlasmoContentScript = {
-  matches : [ "https://openloot.com/*"]
+const api = {
+  owned : 'https://openloot.com/api/market/items?pageSize=1000&page=',
+  purchased : 'https://openloot.com/api/market/purchases?pageSize=100&page=',
+  sold: 'https://openloot.com/api/market/orders?pageSize=100&status[0]=completed&page=',
+  market : 'https://openloot.com/api/market/options?order=name&pageSize=100&primary=false&sort=asc&page=',
 }
 
-export const getInlineAnchor : 
-PlasmoGetInlineAnchor = () =>  
-  document.querySelector(".chakra-link")
+function notify(msg) {
+  console.log(msg)
+}
 
 
+async function loadOwnData(){
+  notify("Getting the NFT you own")
+  let owned:Item[] = await getFromOpenLoot('owned')
 
-  function loadOwnData(){
-    loadPurchase()
-  }
+  notify("Getting your purchase history")
+  let purchased: Order[] = await getFromOpenLoot('purchased')
+
+  notify("Getting your sale history")
+  let sold:Order[] = await getFromOpenLoot('sold')
+
+  notify("Getting market data")
+  let market:Market[] = await getFromOpenLoot('market')
 
 
-  function loadPurchase(){
-
-    let page = 1 
-    const getPurchase = (page)=>{
-        return fetch('https://openloot.com/api/market/purchases?pageSize=100&page='+page)
-    }
+  let data:ItemLocalStorage[] = [];
   
-    let purchasesAcc
-    getPurchase(page)
-      .then(res=> res.json())
-      .then(async (purchases)=>{
-        purchasesAcc = purchases
-        purchasesAcc.items.map(purchasedItem=>{
-          purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
-          if(purchasedItem.item.tags.includes("weapons"))     {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Weapons"}
-          if(purchasedItem.item.tags.includes("armor"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Armor"}
-          if(purchasedItem.item.tags.includes("title"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Title"}
-          if(purchasedItem.item.tags.includes("space"))       {  purchasedItem.category = "utility" ;  purchasedItem.type = "Space"}
-          if(purchasedItem.item.tags.includes("mysterybox"))  {  purchasedItem.category = "utility" ;  purchasedItem.type = "Mystery box"}
-          return purchasedItem
-        })
+  owned.map(nft =>{
+    delete nft.game
+    let item:ItemLocalStorage = nft
+    item.ownershipStatus = "Owned"
+    item.obtentionMethod = "Looted" // At first we set all owned NFT as Looted
 
-        localStorage['purchases'] = JSON.stringify(purchasesAcc)
+    setOwnCategory(nft)
+    data.push(nft)
+  })
 
-        for (let i = 2; i <= purchases.totalPages; i++) {
-            await getPurchase(i)
-              .then(res=> res.json())
-              .then((obj)=>{
-                let purchasedItemsFromCurrentPage = obj.items.map(purchasedItem=>{
-                      purchasedItem.createdAt = new Date(purchasedItem.createdAt).getTime().toString()
-                      if(purchasedItem.item.tags.includes("weapons"))     {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Weapons"}
-                      if(purchasedItem.item.tags.includes("armor"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Armor"}
-                      if(purchasedItem.item.tags.includes("title"))       {  purchasedItem.category = "cosmetic" ;  purchasedItem.type = "Title"}
-                      if(purchasedItem.item.tags.includes("space"))       {  purchasedItem.category = "utility" ;  purchasedItem.type = "Space"}
-                      if(purchasedItem.item.tags.includes("mysterybox"))  {  purchasedItem.category = "utility" ;  purchasedItem.type = "Mystery box"}
-                      return purchasedItem
-                })
-                console.log('purchasedItemsFromCurrentPage',purchasedItemsFromCurrentPage);
-                
-                purchasesAcc.items.push(...purchasedItemsFromCurrentPage);  
-              })
-              .then(()=>localStorage['purchases'] = JSON.stringify(purchasesAcc))
-              
-        }
-    }).then(()=> alert('Your purchases history have been loaded'))
+  notify("Integrate your purchase history into your database")
+  purchased.map(order =>{
+    formatOrderDate(order)
+    let existingItem = data.filter(nft => nft.id == order.item.id)
+    if( existingItem.length){
+      existingItem[0].purchasedDate = order.createdAt
+      existingItem[0].purchasedFrom = order.createdBy
+      existingItem[0].purchasedPrice = order.price
+      existingItem[0].obtentionMethod = "Bought" // we overright the obtention methode
+    }
+    else { 
+      delete order.item.game
+      let item:ItemLocalStorage = order.item
+      item.purchasedDate = order.createdAt
+      item.purchasedFrom = order.createdBy
+      item.purchasedPrice = order.price
+      item.ownershipStatus = "Owned" // the purchased item which are not sold will stay with as it is
+      item.obtentionMethod = "Bought"
+
+      data.push(item)
+    }
+  })
+
+  notify("Integrate your sale history into your database")
+  sold.map(order =>{
+    formatOrderDate(order)
+    let existingItem = data.filter(nft => nft.id == order.item.id)
+    if( existingItem.length){
+      existingItem[0].soldDate = order.createdAt
+      existingItem[0].soldTo = order.completedBy
+      existingItem[0].soldPrice = order.price
+      existingItem[0].ownershipStatus = "Sold" // we overright the status
+    }
+    else { 
+      delete order.item.game
+      let item:ItemLocalStorage = order.item
+      item.soldDate = order.createdAt
+      item.soldTo = order.completedBy
+      item.soldPrice = order.price
+      item.obtentionMethod = "Unknown" // If it has not be added from the purchase data, it means it has been looted
+      item.ownershipStatus = "Sold"
+
+      data.push(item)
+    }
+  })
+
+  notify("Integrate the market price into your database")
+  data.map(nft =>{
+
+    let marketItem = market.filter(marketNft => marketNft.itemMetadata.archetypeId == nft.archetypeId)
+    
+    nft.marketFloorPrice = marketItem[0].lowestPrice
+    nft.marketOpenOrdersCount = marketItem[0].openOrdersCount
+    
+  })
+
+  console.log("NFT",data);
+  
+  localStorage['nft'] = JSON.stringify(data)
+
+
+}
+
+async function getFromOpenLoot(endpoint){
+  let page = 1 
+  let maxpage = await fetch(api[endpoint] + page).then(res => res.json()).then(res => res.totalPages)
+
+  let restults = [];
+  for (let i = 1; i <= maxpage ; i++) {
+    await fetch(api[endpoint] + i).then(res => res.json()).then(res => {
+      restults.push(...res.items)
+    })
   }
+  return restults;
+}
+
+
+function formatOrderDate(orderItem: Order) {
+  orderItem.createdAt = new Date(orderItem.createdAt).getTime().toString()
+}
+
+function setOwnCategory(item : ItemLocalStorage){
+ if(item.tags.includes("weapons"))     {  item.category = "Cosmetic" ;  item.type = "Weapons"}
+ if(item.tags.includes("armor"))       {  item.category = "Cosmetic" ;  item.type = "Armor"}
+ if(item.tags.includes("title"))       {  item.category = "Cosmetic" ;  item.type = "Title"}
+ if(item.tags.includes("space"))       {  item.category = "Utility" ;  item.type = "Space"}
+ if(item.tags.includes("mysterybox"))  {  item.category = "Utility" ;  item.type = "Mystery box"} 
+}

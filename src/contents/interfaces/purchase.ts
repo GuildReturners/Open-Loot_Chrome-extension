@@ -1,15 +1,15 @@
 import { time } from "console";
 import type { Key } from "react";
 
-export interface Purchases {
-    items: PurchasedItem[];
+export interface Orders {
+    items: Order[];
     pageSize: Number;
     currentPage: Number;
     totalPages: Number;
     totalItems: Number;
 }
 
- export interface PurchasedItem {
+ export interface Order {
     id: Key;
     price: Number;
     item : Item;
@@ -19,6 +19,12 @@ export interface Purchases {
     completedBy: string;
     category:string;
     type:string;
+} 
+
+export interface Market {
+    lowestPrice: Number;
+    itemMetadata : Item;
+    openOrdersCount: Number;
 }
 
  export interface Item {
@@ -36,9 +42,33 @@ export interface Purchases {
     issuedId: Number;
     maxIssuance: Number;
     game : {}
-}
- interface Games {
-    totalPages: number;
-    items: [];
-}
+    sellableAt : Number;
+} 
 
+export interface ItemLocalStorage {
+    id: Key;
+    userId: string;
+    status: string;
+    collection: string;
+    optionName: string;
+    archetypeId: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+    tags: string[];
+    rarity: string;
+    issuedId: Number;
+    maxIssuance: Number;
+    category?: "Utility" | "Cosmetic";
+    type?: "Weapons" |"Armor" |"Title" |"Space" |"Mystery box";
+    obtentionMethod? : "Looted" | "Bought" | "Unknown";
+    ownershipStatus? : "Owned" | "Sold"
+    purchasedPrice?: Number;
+    purchasedFrom? : string;
+    purchasedDate? : string;
+    soldPrice?: Number;
+    soldTo? : string;
+    soldDate? : string;
+    marketFloorPrice? : Number;
+    marketOpenOrdersCount? : Number;
+}

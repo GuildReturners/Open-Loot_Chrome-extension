@@ -2,7 +2,7 @@ import React from "react";
 import { FC, useMemo, useReducer, useState } from "react"
 import type { PlasmoContentScript, PlasmoGetInlineAnchor } from "plasmo";
 
-import type { PurchasedItem, Purchases } from "./interfaces/purchase"
+import type { ItemLocalStorage, Order } from "./interfaces/purchase"
 // import { purchasesData } from "./mocks/purchases";
 import MaterialReactTable, { MRT_ColumnDef, MRT_Row } from 'material-react-table';
 import { ExportToCsv } from 'export-to-csv'; 
@@ -68,7 +68,7 @@ function getChipColorFromRarity(rarity) {
 
 function UserStats() {
 
-  let purchasesData:Purchases = JSON.parse( localStorage['purchases'])
+  let purchasesData:ItemLocalStorage[] = JSON.parse( localStorage['nft'])
 
   fixPopover()
 
@@ -77,11 +77,11 @@ function UserStats() {
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const columns = useMemo<MRT_ColumnDef<PurchasedItem>[]>(
+  const columns = useMemo<MRT_ColumnDef<ItemLocalStorage>[]>(
     () => [
       {
         header: 'Item',
-        accessorKey: 'item.name',
+        accessorKey: 'name',
         enableGrouping: true, //don't let this column be grouped
         Cell: ({ cell, row }) => (
           <Box
@@ -94,7 +94,7 @@ function UserStats() {
             <img
               alt="avatar"
               height={30}
-              src={row.original.item.imageUrl}
+              src={row.original.imageUrl}
               loading="lazy"
               style={{ borderRadius: '5%' }}
             />
@@ -103,8 +103,30 @@ function UserStats() {
         ),
       },
       {
-        header: 'Price',
-        accessorKey: 'price',
+        header :'Ownership Status',
+        accessorKey : "ownershipStatus",
+        size:50,
+      },
+      {
+        header :'Obtention Methode',
+        accessorKey : "obtentionMethod",
+        size:50,
+      },
+      {
+        header :'Floor Price',
+        accessorKey : "marketFloorPrice",
+        size:50,
+        aggregationFn: 'sum', 
+        Footer: ({table}) => (
+          <Stack>
+            Total at floor price:
+            <Box color="success.main">{getFloorsSum(table)}</Box>
+          </Stack>
+        ),
+      },
+      {
+        header: 'Bought at',
+        accessorKey: 'purchasedPrice',
         size:50,
         AggregatedCell: ({ cell, table, row, column }) => (
           <Stack
@@ -132,25 +154,59 @@ function UserStats() {
             </Stack>
           </Stack>
         ),
-      },            
-      {
-        header: 'Id',
-        accessorKey: 'item.issuedId',
-        size : 50,
       },
       {
         header: 'Purchase Date',
-        accessorKey: 'createdAt',
+        accessorKey: 'purchasedDate',
         size : 50,
         Cell: ({ cell }) => (
           <>
-            {new Date(parseInt(cell.getValue<string>())).toLocaleDateString()}
+            {cell.getValue<string>() && new Date(parseInt(cell.getValue<string>())).toLocaleDateString()}
           </>
         ),
       },
       {
+        header: 'Purchased From',
+        accessorKey: 'purchasedFrom',
+        Cell: ({ cell }) => (
+          <>
+            {(cell.getValue<string>() && cell.getValue<string>().substring(0,2))}... {(cell.getValue<string>() && cell.getValue<string>().slice(-2))}
+          </>
+        ),
+      },
+      {
+        header: 'Sold Price',
+        accessorKey: 'soldPrice',
+        size : 50,
+      },      
+      {
+        header: 'Sold Date',
+        accessorKey: 'soldDate',
+        size : 50,
+        Cell: ({ cell }) => (
+          <>
+            {cell.getValue<string>() && new Date(parseInt(cell.getValue<string>())).toLocaleDateString()}
+          </>
+        ),
+      },
+      {
+        header: 'Sold to',
+        accessorKey: 'soldTo',
+        Cell: ({ cell }) => (
+          <>
+            {(cell.getValue<string>() && cell.getValue<string>().substring(0,2))}... {(cell.getValue<string>() && cell.getValue<string>().slice(-2))}
+          </>
+        ),
+      },                 
+      {
+        header: 'Id',
+        accessorKey: 'issuedId',
+        size : 50,
+      },
+
+      {
         header: 'Rarity',
-        accessorKey: 'item.rarity',
+        accessorKey: 'rarity',
         size : 50,
         Cell: ({ cell }) => (
           <>
@@ -160,7 +216,7 @@ function UserStats() {
       },
       {
         header: 'Status',
-        accessorKey: 'item.status',
+        accessorKey: 'status',
         size : 50,
       },
       {
@@ -175,17 +231,9 @@ function UserStats() {
       },      
       {
         header: 'openlootid',
-        accessorKey: 'item.id',
+        accessorKey: 'id',
       },   
-      {
-        header: 'Seller',
-        accessorKey: 'createdBy',
-        Cell: ({ cell }) => (
-          <>
-            {(cell.getValue<string>().substring(0,2))}... {(cell.getValue<string>().slice(-2))}
-          </>
-        ),
-      },     
+
       
     ],
     [],
@@ -205,24 +253,33 @@ function UserStats() {
    
    
 
-  const handleExportRows = (rows: MRT_Row<PurchasedItem>[]) => {
+  const handleExportRows = (rows: MRT_Row<ItemLocalStorage>[]) => {
     csvExporter.generateCsv(rows.map((row) => row.original));
+  };
+
+  const getFloorsSum = (table)=>{
+    let count = 0;
+    table.getRowModel().rows.map(val=>{
+      count = count + val.original.marketFloorPrice
+    })
+
+    return count
   };
 
   return (
     <CacheProvider value={styleCache}>
       <MaterialReactTable
         columns={columns}
-        data={purchasesData.items}
+        data={purchasesData}
         enableGrouping
         enableStickyHeader
         enableStickyFooter
         initialState={{
-          columnVisibility: { "item.id": false },
+          columnVisibility: { "id": false },
           density: 'compact',
-          grouping: ['item.name'],
+          grouping: ['name'],
           pagination: { pageIndex: 0, pageSize: 200 },
-          sorting: [{ id: 'createdAt', desc: true }], //sort by state by default
+           sorting: [{ id: 'purchasedDate', desc: true }], //sort by state by default
         }}
         muiToolbarAlertBannerChipProps={{ color: 'primary' }}
         muiTableContainerProps={{ sx: { maxHeight: 500 } }}
@@ -230,11 +287,12 @@ function UserStats() {
         enableRowActions
         renderRowActions={({ row }) => (
           <Box sx={{ display: 'flex', gap: '1rem' }}>
-            <a href={"/account/items/" + row.renderValue("item.id")} target="_blank">
+            <a href={"/account/items/" + row.renderValue("id")} target="_blank">
             <Button>Sell</Button>
             </a>
           </Box>
-        )}
+        )}        
+
         positionToolbarAlertBanner="bottom"
         renderTopToolbarCustomActions={({ table }) => (
           <Box
@@ -243,9 +301,7 @@ function UserStats() {
             <Button
               disabled={table.getPrePaginationRowModel().rows.length === 0}
               //export all rows, including from the next page, (still respects filtering and sorting)
-              onClick={() =>
-                handleExportRows(table.getPrePaginationRowModel().rows)
-              }
+               onClick={() =>handleExportRows(table.getPrePaginationRowModel().rows)}
               startIcon={<FileDownloadIcon />}
               variant="contained"
             >
