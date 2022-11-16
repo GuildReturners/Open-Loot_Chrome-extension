@@ -3,15 +3,15 @@ import type { Key } from "react";
 
 export interface Orders {
     items: Order[];
-    pageSize: Number;
-    currentPage: Number;
-    totalPages: Number;
-    totalItems: Number;
+    pageSize: number;
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
 }
 
  export interface Order {
     id: Key;
-    price: Number;
+    price: number;
     item : Item;
     status: string;
     createdBy: string;
@@ -22,9 +22,9 @@ export interface Orders {
 } 
 
 export interface Market {
-    lowestPrice: Number;
+    lowestPrice: number;
     itemMetadata : Item;
-    openOrdersCount: Number;
+    openOrdersCount: number;
 }
 
  export interface Item {
@@ -39,10 +39,10 @@ export interface Market {
     imageUrl: string;
     tags: string[];
     rarity: string;
-    issuedId: Number;
-    maxIssuance: Number;
+    issuedId: number;
+    maxIssuance: number;
     game : {}
-    sellableAt : Number;
+    sellableAt : number;
 } 
 
 export interface ItemLocalStorage {
@@ -57,18 +57,18 @@ export interface ItemLocalStorage {
     imageUrl: string;
     tags: string[];
     rarity: string;
-    issuedId: Number;
-    maxIssuance: Number;
+    issuedId: number;
+    maxIssuance: number;
     category?: "Utility" | "Cosmetic";
     type?: "Weapons" |"Armor" |"Title" |"Space" |"Mystery box";
     obtentionMethod? : "Looted" | "Bought" | "Unknown";
     ownershipStatus? : "Owned" | "Sold"
-    purchasedPrice?: Number;
+    purchasedPrice?: number;
     purchasedFrom? : string;
     purchasedDate? : string;
-    soldPrice?: Number;
+    soldPrice?: number;
     soldTo? : string;
     soldDate? : string;
-    marketFloorPrice? : Number;
-    marketOpenOrdersCount? : Number;
+    marketFloorPrice? : number;
+    marketOpenOrdersCount? : number;
 }
