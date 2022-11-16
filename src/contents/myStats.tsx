@@ -19,7 +19,7 @@ export const config: PlasmoContentScript = {
 
 // Configure under which element of the page this component will be mounted
 export const getInlineAnchor = () => {
-  return document.querySelector("header")
+  return document.querySelector("main")
 }
 
 // Inject style from without the component shadow root

@@ -1,7 +1,7 @@
 {
   "name": "returners-open-loot-chrome-extension",
   "displayName": "Returners  - Open Loot",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Giving super power to Open Loot",
   "author": "Zet",
   "packageManager": "npm@8.19.2",
@@ -10,12 +10,13 @@
     "build": "plasmo build"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.12",
     "@mui/icons-material": "^5.10.9",
-    "@mui/material": "^5.10.9",
+    "@mui/lab": "^5.0.0-alpha.108",
+    "@mui/material": "^5.10.14",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.7",
     "export-to-csv": "^0.2.1",
@@ -23,6 +24,7 @@
     "plasmo": "0.56.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-minimal-pie-chart": "^8.4.0",
     "tailwindcss": "^3.1.8"
   },
   "devDependencies": {
