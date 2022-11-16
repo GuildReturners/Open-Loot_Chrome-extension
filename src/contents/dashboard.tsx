@@ -17,7 +17,7 @@ export const config: PlasmoContentScript = {
 
 // Configure under which element of the page this component will be mounted
 export const getInlineAnchor = () => {
-  return document.querySelector("main  ")
+  return document.querySelector("main")
 }
 
 
