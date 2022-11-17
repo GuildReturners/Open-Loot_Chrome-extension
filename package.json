@@ -1,7 +1,7 @@
 {
   "name": "returners-open-loot-chrome-extension",
   "displayName": "Returners  - Open Loot",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Giving super power to Open Loot",
   "author": "Zet",
   "packageManager": "npm@8.19.2",
