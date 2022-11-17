@@ -13,7 +13,6 @@ import { PieChart } from 'react-minimal-pie-chart';
 // Configure on which page this component will be mounted
 export const config: PlasmoContentScript = {
   matches: ["https://openloot.com/dashboard"],
-  exclude_matches : ['https://openloot.com/explore']
 }
 
 
