@@ -17,19 +17,18 @@ export const config: PlasmoContentScript = {
   matches : [ "https://openloot.com/my-stats"]
 }
 
-// Configure under which element of the page this component will be mounted
-export const getInlineAnchor = () => {
+export const getRootContainer = () => {
   return document.querySelector("main")
+  // return document.querySelector("main .chakra-container")
 }
 
-// Inject style from without the component shadow root
 const styleElement = document.createElement("style")
+
 const styleCache = createCache({
   key: "plasmo-mui-cache",
-  prepend: true,
-  container: styleElement
+  insertionPoint : document.querySelector('head'),
+  container: styleElement, 
 })
-export const getStyle = () => styleElement
 
 // QUICK FIX : the MUI popover is not injected within the component shadow root, so the injected style above this liine is not applied to it.
 // TODO : 
@@ -37,7 +36,7 @@ export const getStyle = () => styleElement
 //   - Or inject all the style directly into the webpage 
 function fixPopover(){
   const popoverStyle = document.createElement("style")
-  popoverStyle.innerText = `.MuiPopover-root {background-color: white;}svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.plasmo-mui-cache-i4bv87-MuiSvgIcon-root {height: 25px;}.MuiBox-root.plasmo-mui-cache-70qvj9 {display: flex;color: black;cursor: pointer;margin-bottom: 10px;}`;
+  popoverStyle.innerText = `svg.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.plasmo-mui-cache-i4bv87-MuiSvgIcon-root {height: 25px;}`;
   document.querySelector("body").appendChild(popoverStyle)
 }
 
@@ -93,27 +92,26 @@ function UserStats() {
           >
             <img
               alt="avatar"
-              height={30}
               src={row.original.imageUrl}
               loading="lazy"
-              style={{ borderRadius: '5%' }}
+              style={{ borderRadius: '5%' ,maxHeight:'30px'}}
             />
             <Typography>{cell.getValue<string>()}</Typography>
           </Box>
         ),
       },
       {
-        header :'Ownership Status',
+        header :'Status',
         accessorKey : "ownershipStatus",
         size:50,
       },
       {
-        header :'Obtention Methode',
+        header :'Obtention',
         accessorKey : "obtentionMethod",
         size:50,
       },
       {
-        header :'Floor Price',
+        header :'Floor $',
         accessorKey : "marketFloorPrice",
         size:50,
         aggregationFn: 'sum', 
@@ -125,7 +123,7 @@ function UserStats() {
         ),
       },
       {
-        header: 'Bought at',
+        header: 'Buy $',
         accessorKey: 'purchasedPrice',
         size:50,
         AggregatedCell: ({ cell, table, row, column }) => (
@@ -175,7 +173,7 @@ function UserStats() {
         ),
       },
       {
-        header: 'Sold Price',
+        header: 'Sold $',
         accessorKey: 'soldPrice',
         size : 50,
       },      
@@ -267,7 +265,6 @@ function UserStats() {
   };
 
   return (
-    <CacheProvider value={styleCache}>
       <MaterialReactTable
         columns={columns}
         data={purchasesData}
@@ -275,9 +272,9 @@ function UserStats() {
         enableStickyHeader
         enableStickyFooter
         initialState={{
-          columnVisibility: { "id": false },
+          columnVisibility: { "id": false, "soldTo" : false, "soldDate": false, "purchasedFrom":false, "purchasedDate":false },
           density: 'compact',
-          grouping: ['name'],
+          // grouping: ['name'],
           pagination: { pageIndex: 0, pageSize: 200 },
            sorting: [{ id: 'purchasedDate', desc: true }], //sort by state by default
         }}
@@ -319,7 +316,6 @@ function UserStats() {
           </Box>
         )}
       />
-    </CacheProvider>
   );
 }
   

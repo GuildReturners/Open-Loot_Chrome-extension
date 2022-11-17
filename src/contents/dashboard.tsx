@@ -12,29 +12,29 @@ import { PieChart } from 'react-minimal-pie-chart';
 
 // Configure on which page this component will be mounted
 export const config: PlasmoContentScript = {
-  matches: ["https://openloot.com/dashboard"]
-}
-
-// Configure under which element of the page this component will be mounted
-export const getInlineAnchor = () => {
-  return document.querySelector("main  ")
+  matches: ["https://openloot.com/dashboard"],
+  exclude_matches : ['https://openloot.com/explore']
 }
 
 
+export const getRootContainer = () => {
+  return document.querySelector("main .chakra-container")
+}
 
 const styleElement = document.createElement("style")
 
 const styleCache = createCache({
   key: "plasmo-mui-cache",
-  prepend: false,
-  container: styleElement
+  insertionPoint : document.querySelector('head'),
+  container: styleElement, 
 })
 
 export const getStyle = () => styleElement
 
 
-
 function Dashboard() {
+
+
 
   let nftData: ItemLocalStorage[] = JSON.parse(localStorage['nft'])
 
@@ -51,7 +51,6 @@ function Dashboard() {
   // const profitValue = ownedValue - realSpentValue;
 
   return (
-    <CacheProvider value={styleCache}>
 
       <Box>
 
@@ -304,7 +303,6 @@ function Dashboard() {
 
 
 
-    </CacheProvider>
   );
 }
 
